@@ -1,4 +1,7 @@
 import torch
+import argparse
+import yaml
+import os
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
@@ -8,6 +11,7 @@ from utils.losses.contrastive_loss import ContrastiveLossEuclidean
 from utils.train import train_simplistic
 from utils.util import load_model_add_head
 from torchsummary import summary
+
 
 # Set device
 def main(log_dir,finetune_model_path):
@@ -57,14 +61,34 @@ criterion = nn.CrossEntropyLoss()
 train_simplistic(
     epochs, model, device, train_loader, criterion, optimizer, log_dir
 )
-import argparse
+
+
+def load_config(config_path):
+    with open(config_path, "r") as f:
+        return yaml.safe_load(f)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--log_dir", type=str, required=True)
-    parser.add_argument("--finetune_model_path", type=str, required=True)
+    parser.add_argument("--log_dir", type=str, help="Log directory")
+    parser.add_argument("--finetune_model_path", type=str, help="Path to model")
+    parser.add_argument("--config", type=str, help="Path to YAML config file")
 
+    
     args = parser.parse_args()
 
-    main(args.log_dir, args.finetune_model_path)
+    config = {}
+    if args.config:
+        config = load_config(args.config)
+
+    log_dir = args.log_dir or config.get("log_dir",None)
+    finetune_model_path = args.finetune_model_path or config.get("finetune_model_path")
+
+    if not log_dir or not finetune_model_path:
+        raise ValueError("Please provide log_dir and finetune_model_path via CLI or config file")
+
+    if not os.path.exists(finetune_model_path):
+        raise FileNotFoundError(f"Model path not found: {finetune_model_path}")
+
+    
+    main(log_dir, finetune_model_path)
