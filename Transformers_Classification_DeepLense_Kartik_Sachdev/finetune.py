@@ -10,9 +10,9 @@ from utils.util import load_model_add_head
 from torchsummary import summary
 
 # Set device
-device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu")
-learning_method = "contrastive_embedding"
-saved_model_path = "/home/kartik/git/deepLense_transformer_ssl/output/pretrained_contrastive_embedding.pth"
+def main(log_dir,finetune_model_path):
+    device = "cuda"  # torch.device("cuda" if torch.cuda.is_available() else "cpu"
+    learning_method = "contrastive_embedding"
 
 # Set hyperparameters
 batch_size = 128
@@ -40,7 +40,7 @@ finetune_head = nn.Sequential(
 
 model = load_model_add_head(
     pretrain_model=pretrain_model,
-    saved_model_path=saved_model_path,
+    saved_model_path=finetune_model_path,
     head=finetune_head,
     freeze_pretrain_layers=True,
 )
@@ -55,5 +55,5 @@ criterion = nn.CrossEntropyLoss()
 
 # Training loop
 train_simplistic(
-    epochs, model, device, train_loader, criterion, optimizer, saved_model_path
+    epochs, model, device, train_loader, criterion, optimizer, log_dir
 )
