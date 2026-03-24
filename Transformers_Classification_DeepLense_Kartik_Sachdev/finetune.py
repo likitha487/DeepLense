@@ -57,3 +57,14 @@ criterion = nn.CrossEntropyLoss()
 train_simplistic(
     epochs, model, device, train_loader, criterion, optimizer, log_dir
 )
+import argparse
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--log_dir", type=str, required=True)
+    parser.add_argument("--finetune_model_path", type=str, required=True)
+
+    args = parser.parse_args()
+
+    main(args.log_dir, args.finetune_model_path)
